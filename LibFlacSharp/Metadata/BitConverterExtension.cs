@@ -25,6 +25,12 @@ namespace LibFlacSharp.Metadata {
             return BitConverter.ToUInt64(bytes.Reverse().ToArray(), 0);
         }
 
+        public static uint ConvertEndian(uint endian) {
+
+            var bytes = BitConverter.GetBytes(endian);
+            return BitConverter.ToUInt32(bytes.Reverse().ToArray(), 0);
+        }
+
         public static int ConvertEndian20(int endian) {
 
             endian &= 0x000FFFFF;

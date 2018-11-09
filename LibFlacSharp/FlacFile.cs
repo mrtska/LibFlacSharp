@@ -19,6 +19,7 @@ namespace LibFlacSharp {
         /// </summary>
         public StreamInfo StreamInfo { get; private set; }
 
+        public Picture PictureInfo { get; private set; }
 
         /// <summary>
         /// Open flac file by file path.
@@ -81,6 +82,11 @@ namespace LibFlacSharp {
                     case MetadataBlockType.STREAMINFO: {
 
                             StreamInfo = StreamInfo.FromByteArray(Reader.ReadBytes(length));
+                            break;
+                        }
+                    case MetadataBlockType.PICTURE: {
+
+                            PictureInfo = Picture.FromByteArray(Reader.ReadBytes(length));
                             break;
                         }
                     default: {

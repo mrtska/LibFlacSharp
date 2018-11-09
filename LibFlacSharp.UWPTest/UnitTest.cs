@@ -28,6 +28,11 @@ namespace LibFlacSharp.UWPTest {
             var file = new FlacFile(await stream.OpenStreamForWriteAsync());
 
 
+            //var hoge = await KnownFolders.MusicLibrary.CreateFileAsync("hogehoge.jpg", CreationCollisionOption.ReplaceExisting);
+            //var str = await hoge.OpenStreamForWriteAsync();
+            //str.Write(file.PictureInfo.PictureData, 0, file.PictureInfo.PictureData.Length);
+            //str.Close();
+            ;
         }
     
         [TestMethod]
