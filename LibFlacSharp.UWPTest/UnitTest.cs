@@ -24,9 +24,10 @@ namespace LibFlacSharp.UWPTest {
 
 
             var stream = await KnownFolders.MusicLibrary.GetFileAsync("test1.flac");
+            var stream2 = await KnownFolders.MusicLibrary.CreateFileAsync("test2.flac", CreationCollisionOption.ReplaceExisting);
 
             var file = new FlacFile(await stream.OpenStreamForWriteAsync());
-
+            file.Save(await stream2.OpenStreamForWriteAsync());
 
             //var hoge = await KnownFolders.MusicLibrary.CreateFileAsync("hogehoge.jpg", CreationCollisionOption.ReplaceExisting);
             //var str = await hoge.OpenStreamForWriteAsync();

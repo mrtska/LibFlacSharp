@@ -1,5 +1,6 @@
 ﻿using LibFlacSharp.Metadata;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,13 @@ namespace LibFlacSharp {
         /// </summary>
         public StreamInfo StreamInfo { get; private set; }
 
-        public Picture PictureInfo { get; private set; }
+        public Dictionary<PictureType, Picture> Pictures { get; private set; }
+
+
+        public VorbisComment VorbisComment { get; private set; }
+
+
+        public byte[] Frame { get; private set; }
 
         /// <summary>
         /// Open flac file by file path.
@@ -46,6 +53,7 @@ namespace LibFlacSharp {
         private void Initialize() {
 
             Reader = new BinaryReader(InMemoryByteArray);
+            Pictures = new Dictionary<PictureType, Picture>();
             VerifyFileHeader();
             Parse();
         }
@@ -86,31 +94,67 @@ namespace LibFlacSharp {
                         }
                     case MetadataBlockType.PICTURE: {
 
-                            PictureInfo = Picture.FromByteArray(Reader.ReadBytes(length));
+                            var picture = Picture.FromByteArray(Reader.ReadBytes(length));
+
+                            Pictures[picture.PictureType] = picture;
+                            break;
+                        }
+                    case MetadataBlockType.VORBIS_COMMENT: {
+
+                            VorbisComment = VorbisComment.FromByteArray(Reader.ReadBytes(length));
                             break;
                         }
                     default: {
 
                             ;
-
                             break;
                         }
                 }
-                
-
-
-
-
-
-
             }
 
+            Frame = Reader.ReadBytes((int)(InMemoryByteArray.Length - InMemoryByteArray.Position));
+            ;
+        }
 
 
+        public void Save(Stream destination) {
+
+            var writeTo = new MemoryStream();
+            using (var writer = new BinaryWriter(writeTo)) {
+
+                writer.Write(Encoding.ASCII.GetBytes("fLaC"));
+                writer.Write((byte)MetadataBlockType.STREAMINFO);
+                var stream = StreamInfo.ToByteArray();
 
 
+                writer.Write(BitConverter.GetBytes(BitConverterExtension.ConvertEndian24(stream.Length)), 0, 3);
+                writer.Write(stream);
 
+                foreach(var picture in Pictures) {
 
+                    stream = picture.Value.ToByteArray();
+                    writer.Write((byte)MetadataBlockType.PICTURE);
+                    writer.Write(BitConverter.GetBytes(BitConverterExtension.ConvertEndian24(stream.Length)), 0, 3);
+
+                    writer.Write(stream);
+                }
+
+                stream = VorbisComment.ToByteArray();
+                writer.Write((byte)MetadataBlockType.VORBIS_COMMENT);
+                writer.Write(BitConverter.GetBytes(BitConverterExtension.ConvertEndian24(stream.Length)), 0, 3);
+
+                writer.Write(stream);
+
+                writer.Write((byte)0x81);
+
+                writer.Write(Frame);
+
+                writeTo.Flush();
+                writeTo.Position = 0;
+                writeTo.CopyTo(destination);
+
+                destination.Close();
+            }
 
 
         }

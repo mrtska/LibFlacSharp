@@ -104,6 +104,17 @@ namespace LibFlacSharp.Metadata {
             return result;
         }
 
-    }
+        public byte[] ToByteArray() {
 
+            var size = Marshal.SizeOf(this);
+            var bytearray = new byte[size];
+
+            var ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(this, ptr, true);
+            Marshal.Copy(ptr, bytearray, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return bytearray;
+        }
+    }
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LibFlacSharp.Metadata {
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Picture {
 
         private uint _PictureType;
@@ -106,6 +106,7 @@ namespace LibFlacSharp.Metadata {
         /// <summary>
         /// The binary picture data.
         /// </summary>
+        [MarshalAs(UnmanagedType.ByValArray)]
         public byte[] PictureData;
 
         /// <summary>
@@ -122,7 +123,12 @@ namespace LibFlacSharp.Metadata {
         }
 
 
-        public static Picture FromByteArray(byte[] array) {
+        /// <summary>
+        /// For internal use.
+        /// </summary>
+        /// <param name="array">Raw byte array</param>
+        /// <returns></returns>
+        internal static Picture FromByteArray(byte[] array) {
 
             var ptr = Marshal.AllocHGlobal(array.Length);
             var basePtr = ptr;
@@ -172,8 +178,25 @@ namespace LibFlacSharp.Metadata {
 
             return picture;
         }
+        public byte[] ToByteArray() {
 
+            var array = new MemoryStream();
+            using (var writer = new BinaryWriter(array)) {
 
+                writer.Write(_PictureType);
+                writer.Write(_MIMETypeLength);
+                writer.Write(_MIMEType);
+                writer.Write(_DescriptionLength);
+                writer.Write(_Description);
+                writer.Write(_PictureWidth);
+                writer.Write(_PictureHeight);
+                writer.Write(_PictureDepth);
+                writer.Write(_PictureIndexColorCount);
+                writer.Write(_PictureDataLength);
+                writer.Write(PictureData);
+                return array.ToArray();
+            }
+        }
     }
 
     public enum PictureType {
