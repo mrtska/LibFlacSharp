@@ -1,12 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace LibFlacSharp.Metadata {
 
-    public struct VorbisCommentEntry {
+    public static class VorbisCommentType {
+
+        public const string Artist = "ARTIST";
+
+        public const string Album = "ALBUM";
+
+        public const string Copyright = "COPYRIGHT";
+
+        public const string DiscNumber = "DISCNUMBER";
+
+        public const string DiscTotal = "DISCTOTAL";
+
+        public const string Lyrics = "LYRICS";
+
+        public const string Title = "TITLE";
+
+        public const string TrackNumber = "TRACKNUMBER";
+
+        public const string TrackTotal = "TRACKTOTAL";
+
+        public const string Year = "YEAR";
+
+        public const string Composer = "COMPOSER";
+
+        public const string Genre = "GENRE";
+
+    }
+
+
+    public class VorbisCommentEntry {
 
         /// <summary>
         /// UTF8 comment string length.
@@ -23,13 +50,7 @@ namespace LibFlacSharp.Metadata {
         }
     }
 
-    public struct VorbisComment {
-
-        /// <summary>
-        /// The vendor string length.
-        /// </summary>
-        public uint VendorLength;
-
+    public class VorbisComment {
 
         private byte[] _VendorString;
         /// <summary>
@@ -40,52 +61,32 @@ namespace LibFlacSharp.Metadata {
             set { _VendorString = Encoding.UTF8.GetBytes(value); }
         }
         /// <summary>
-        /// Comment list size.
+        /// Comment Sets.
         /// </summary>
-        public uint UserCommentListLength;
-
-        public VorbisCommentEntry[] CommentList;
+        public Dictionary<string, string> CommentList { get; private set; }
 
         public static VorbisComment FromByteArray(byte[] array) {
 
-            var ptr = Marshal.AllocHGlobal(array.Length);
-            var basePtr = ptr;
+            using (var reader = new BinaryReader(new MemoryStream(array))) {
 
-            Marshal.Copy(array, 0, ptr, array.Length);
+                var vorbis = new VorbisComment();
+                var vendorLength = reader.ReadUInt32();
+                vorbis._VendorString = reader.ReadBytes((int)vendorLength);
+                var length = reader.ReadUInt32();
 
-            var vorbis = new VorbisComment();
+                vorbis.CommentList = new Dictionary<string, string>();
+                for(int i = 0; i < length; i++) {
 
-            vorbis.VendorLength = (uint)Marshal.ReadInt32(ptr);
-            ptr += 4;
+                    var entry = new VorbisCommentEntry();
+                    entry.Length = reader.ReadUInt32();
+                    entry._Comment = reader.ReadBytes((int)entry.Length);
 
-            var bytes = new byte[vorbis.VendorLength];
-            Marshal.Copy(ptr, bytes, 0, bytes.Length);
+                    var str = entry.Comment.Split('=');
 
-            vorbis._VendorString = bytes;
-            ptr += bytes.Length;
-
-            vorbis.UserCommentListLength = (uint)Marshal.ReadInt32(ptr);
-            ptr += 4;
-
-            var list = new List<VorbisCommentEntry>();
-
-            for(int i = 0; i < vorbis.UserCommentListLength; i++) {
-
-                var entry = new VorbisCommentEntry();
-
-                entry.Length = (uint)Marshal.ReadInt32(ptr);
-                ptr += 4;
-                bytes = new byte[entry.Length];
-                Marshal.Copy(ptr, bytes, 0, bytes.Length);
-                ptr += bytes.Length;
-
-                entry._Comment = bytes;
-                list.Add(entry);
+                    vorbis.CommentList[str[0]] = str[1];
+                }
+                return vorbis;
             }
-            vorbis.CommentList = list.ToArray();
-
-            Marshal.FreeHGlobal(basePtr);
-            return vorbis;
         }
 
         public byte[] ToByteArray() {
@@ -93,12 +94,17 @@ namespace LibFlacSharp.Metadata {
             var array = new MemoryStream();
             using (var writer = new BinaryWriter(array)) {
 
-                writer.Write(VendorLength);
-                writer.Write(_VendorString);
-                writer.Write(UserCommentListLength);
-                foreach (var entry in CommentList) {
+                VendorString = "LibFlacSharp 1.0.0 20181113";
 
-                    writer.Write(entry.Length);
+                writer.Write(_VendorString.Length);
+                writer.Write(_VendorString);
+                writer.Write(CommentList.Count);
+                foreach (var set in CommentList) {
+
+                    var entry = new VorbisCommentEntry();
+                    entry.Comment = set.Key + "=" + set.Value;
+
+                    writer.Write(entry._Comment.Length);
                     writer.Write(entry._Comment);
                 }
                 return array.ToArray();

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LibFlacSharp.Metadata {
+﻿namespace LibFlacSharp.Metadata {
     public enum MetadataBlockType : byte {
 
         STREAMINFO = 0,

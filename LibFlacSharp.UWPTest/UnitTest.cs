@@ -1,10 +1,9 @@
-﻿using System;
+﻿using LibFlacSharp.Metadata;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using LibFlacSharp.Metadata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace LibFlacSharp.UWPTest {
 
@@ -24,16 +23,16 @@ namespace LibFlacSharp.UWPTest {
 
 
             var stream = await KnownFolders.MusicLibrary.GetFileAsync("test1.flac");
+            var png = await KnownFolders.MusicLibrary.GetFileAsync("300367.png");
             var stream2 = await KnownFolders.MusicLibrary.CreateFileAsync("test2.flac", CreationCollisionOption.ReplaceExisting);
 
             var file = new FlacFile(await stream.OpenStreamForWriteAsync());
-            file.Save(await stream2.OpenStreamForWriteAsync());
 
-            //var hoge = await KnownFolders.MusicLibrary.CreateFileAsync("hogehoge.jpg", CreationCollisionOption.ReplaceExisting);
-            //var str = await hoge.OpenStreamForWriteAsync();
-            //str.Write(file.PictureInfo.PictureData, 0, file.PictureInfo.PictureData.Length);
-            //str.Close();
-            ;
+            file.AddPicture(PictureType.CoverFront, await png.OpenStreamForReadAsync());
+
+            file.VorbisComment.CommentList[VorbisCommentType.Album] = "test";
+
+            await file.SaveAsync(await stream2.OpenStreamForWriteAsync());
         }
     
         [TestMethod]
