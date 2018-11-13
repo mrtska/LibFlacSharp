@@ -4,6 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Authors>mrtska</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseUrl>https://github.com/mrtska/LibFlacSharp/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/mrtska/LibFlacSharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mrtska/LibFlacSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>flac</PackageTags>
+    <Copyright>mrtska</Copyright>
+    <Description>.NET Standard flac metadata library.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
