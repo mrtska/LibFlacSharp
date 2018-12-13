@@ -239,8 +239,6 @@ namespace LibFlacSharp {
                 await writeTo.FlushAsync();
                 writeTo.Position = 0;
                 await writeTo.CopyToAsync(destination);
-
-                destination.Close();
             }
         }
 
