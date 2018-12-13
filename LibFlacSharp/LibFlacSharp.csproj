@@ -11,7 +11,7 @@
     <PackageTags>flac</PackageTags>
     <Copyright>mrtska</Copyright>
     <Description>.NET Standard flac metadata library.</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
