@@ -94,6 +94,11 @@ namespace LibFlacSharp {
                             StreamInfo = StreamInfo.FromByteArray(Reader.ReadBytes(length));
                             break;
                         }
+                    case MetadataBlockType.SEEKTABLE: {
+
+                            Reader.ReadBytes(length);
+                            break;
+                        }
                     case MetadataBlockType.PICTURE: {
 
                             var picture = Picture.FromByteArray(Reader.ReadBytes(length));
@@ -107,8 +112,8 @@ namespace LibFlacSharp {
                             break;
                         }
                     default: {
-
-                            ;
+                            // Discard
+                            Reader.ReadBytes(length);
                             break;
                         }
                 }
