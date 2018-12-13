@@ -66,6 +66,11 @@ namespace LibFlacSharp.Metadata {
         /// </summary>
         public Dictionary<string, string> CommentList { get; private set; }
 
+        public VorbisComment() {
+
+            CommentList = new Dictionary<string, string>();
+        }
+
         public static VorbisComment FromByteArray(byte[] array) {
 
             using (var reader = new BinaryReader(new MemoryStream(array))) {
@@ -75,7 +80,6 @@ namespace LibFlacSharp.Metadata {
                 vorbis._VendorString = reader.ReadBytes((int)vendorLength);
                 var length = reader.ReadUInt32();
 
-                vorbis.CommentList = new Dictionary<string, string>();
                 for(int i = 0; i < length; i++) {
 
                     var entry = new VorbisCommentEntry();
@@ -134,7 +138,7 @@ namespace LibFlacSharp.Metadata {
             var array = new MemoryStream();
             using (var writer = new BinaryWriter(array)) {
 
-                VendorString = "LibFlacSharp 1.0.0 20181113";
+                VendorString = "LibFlacSharp 1.0.3 20181214";
 
                 writer.Write(_VendorString.Length);
                 writer.Write(_VendorString);

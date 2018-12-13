@@ -118,6 +118,8 @@ namespace LibFlacSharp {
                         }
                 }
             }
+
+            if (VorbisComment == null) VorbisComment = new VorbisComment();
             Frame = Reader.ReadBytes((int)(InMemoryByteArray.Length - InMemoryByteArray.Position));
         }
 
