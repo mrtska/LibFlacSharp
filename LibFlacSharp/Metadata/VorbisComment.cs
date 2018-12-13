@@ -6,30 +6,31 @@ namespace LibFlacSharp.Metadata {
 
     public static class VorbisCommentType {
 
-        public const string Artist = "ARTIST";
+        public const string Title = "Title";
 
-        public const string Album = "ALBUM";
+        public const string Artist = "Artist";
 
-        public const string Copyright = "COPYRIGHT";
+        public const string Lyricist = "Lyricist";
 
-        public const string DiscNumber = "DISCNUMBER";
+        public const string Composer = "Composer";
 
-        public const string DiscTotal = "DISCTOTAL";
+        public const string Album = "Album";
 
-        public const string Lyrics = "LYRICS";
+        public const string Genre = "Genre";
 
-        public const string Title = "TITLE";
+        public const string Lyrics = "Lyrics";
 
-        public const string TrackNumber = "TRACKNUMBER";
+        public const string Year = "Year";
 
-        public const string TrackTotal = "TRACKTOTAL";
+        public const string TrackNumber = "TrackNumber";
 
-        public const string Year = "YEAR";
+        public const string TrackTotal = "TrackTotal";
 
-        public const string Composer = "COMPOSER";
+        public const string DiscNumber = "DiscNumber";
 
-        public const string Genre = "GENRE";
+        public const string DiscTotal = "DiscTotal";
 
+        public const string Copyright = "Copyright";
     }
 
 
@@ -82,8 +83,47 @@ namespace LibFlacSharp.Metadata {
                     entry._Comment = reader.ReadBytes((int)entry.Length);
 
                     var str = entry.Comment.Split('=');
-
-                    vorbis.CommentList[str[0]] = str[1];
+                    switch(str[0].ToLower()) {
+                        case "title":
+                            vorbis.CommentList[VorbisCommentType.Title] = str[1];
+                            break;
+                        case "artist":
+                            vorbis.CommentList[VorbisCommentType.Artist] = str[1];
+                            break;
+                        case "lyricist":
+                            vorbis.CommentList[VorbisCommentType.Lyricist] = str[1];
+                            break;
+                        case "composer":
+                            vorbis.CommentList[VorbisCommentType.Composer] = str[1];
+                            break;
+                        case "album":
+                            vorbis.CommentList[VorbisCommentType.Album] = str[1];
+                            break;
+                        case "genre":
+                            vorbis.CommentList[VorbisCommentType.Genre] = str[1];
+                            break;
+                        case "lyrics":
+                            vorbis.CommentList[VorbisCommentType.Lyrics] = str[1];
+                            break;
+                        case "year":
+                            vorbis.CommentList[VorbisCommentType.Year] = str[1];
+                            break;
+                        case "tracknumber":
+                            vorbis.CommentList[VorbisCommentType.TrackNumber] = str[1];
+                            break;
+                        case "tracktotal":
+                            vorbis.CommentList[VorbisCommentType.TrackTotal] = str[1];
+                            break;
+                        case "discnumber":
+                            vorbis.CommentList[VorbisCommentType.DiscNumber] = str[1];
+                            break;
+                        case "disctotal":
+                            vorbis.CommentList[VorbisCommentType.DiscTotal] = str[1];
+                            break;
+                        default:
+                            vorbis.CommentList[str[0]] = str[1];
+                            break;
+                    }
                 }
                 return vorbis;
             }
